@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Girth Gain Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Girth Gain Calculator</h1>
+    <p>Calculate how many hours you spend per 0.1-inch of girth gain.</p>
+    
+    <form id="calculatorForm">
+      <label for="girthGain">Total Girth Gain:</label>
+      <input type="number" id="girthGain" name="girthGain" step="0.01" required />
+      
+      <label for="unitSelect">Unit:</label>
+      <select id="unitSelect" name="unitSelect">
+        <option value="inches">Inches</option>
+        <option value="mm">Millimetres</option>
+      </select>
+
+      <fieldset>
+        <legend>Time Input Method:</legend>
+        <label>
+          <input type="radio" name="timeMethod" value="total" checked />
+          Total Hours Spent
+        </label>
+        <label>
+          <input type="radio" name="timeMethod" value="weekly" />
+          Weekly Hours and Duration
+        </label>
+      </fieldset>
+      
+      <div id="totalHoursInput">
+        <label for="totalHours">Total Hours Spent:</label>
+        <input type="number" id="totalHours" name="totalHours" step="0.1" required />
+      </div>
+      
+      <div id="weeklyHoursInput" class="hidden">
+        <label for="hoursPerWeek">Hours per Week:</label>
+        <input type="number" id="hoursPerWeek" name="hoursPerWeek" step="0.1" />
+        
+        <label for="weeksDuration">Duration (weeks):</label>
+        <input type="number" id="weeksDuration" name="weeksDuration" step="1" />
+      </div>
+
+      <button type="submit">Calculate</button>
+    </form>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
