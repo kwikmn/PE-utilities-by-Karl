@@ -1,3 +1,4 @@
+/* Basic styling with a background image if desired. */
 body {
   font-family: Arial, sans-serif;
   color: #333;
@@ -8,21 +9,16 @@ body {
 }
 
 .container {
-  max-width: 500px;
+  max-width: 600px;
   margin: 2rem auto;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.9); /* Slightly transparent white for readability */
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
   text-align: center;
-}
-
-p {
-  margin-top: 0.5rem;
-  margin-bottom: 1.5rem;
 }
 
 form {
@@ -53,4 +49,9 @@ button {
   margin-top: 2rem;
   font-weight: bold;
   text-align: center;
+}
+
+#myChart {
+  margin-top: 2rem;
+  background-color: #fff; /* For clarity if your container is semi-transparent */
 }

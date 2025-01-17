@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Girth Gain Calculator</title>
+  <title>Girth Gain Calculator w/ Bell Curve</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>Girth Gain Calculator</h1>
-    <p>Calculate how many hours you spend per 0.1-inch of girth gain.</p>
+    <p>Calculate your approximate hours to gain 0.1" of girth and see where you land on the bell curve.</p>
+    
+    <!-- Succinct note with link to the article -->
+    <p>
+      Interested in learning how to interpret these numbers? Read the 
+      <a href="https://www.reddit.com/r/TheScienceOfPE/comments/1i26l7o/training_volume_is_the_king_of_girth_gains_doing/" target="_blank">
+        original article
+      </a>.
+    </p>
 
+    <!-- The Form -->
     <form id="calculatorForm">
       <label for="girthGain">Total Girth Gain:</label>
       <input type="number" id="girthGain" name="girthGain" step="0.01" required />
@@ -32,16 +41,16 @@
           Weekly Hours and Duration
         </label>
       </fieldset>
-
+      
       <div id="totalHoursInput">
         <label for="totalHours">Total Hours Spent:</label>
         <input type="number" id="totalHours" name="totalHours" step="0.1" required />
       </div>
-
+      
       <div id="weeklyHoursInput" class="hidden">
         <label for="hoursPerWeek">Hours per Week:</label>
         <input type="number" id="hoursPerWeek" name="hoursPerWeek" step="0.1" />
-
+        
         <label for="weeksDuration">Duration (weeks):</label>
         <input type="number" id="weeksDuration" name="weeksDuration" step="1" />
       </div>
@@ -49,10 +58,18 @@
       <button type="submit">Calculate</button>
     </form>
 
+    <!-- Results area -->
     <div id="result" class="result"></div>
     <div id="visualization" class="result"></div>
+
+    <!-- The canvas for our bell curve -->
+    <canvas id="myChart" width="500" height="300"></canvas>
   </div>
 
+  <!-- Load Chart.js from a CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Your logic in a separate JS file -->
   <script src="script.js"></script>
 </body>
 </html>
