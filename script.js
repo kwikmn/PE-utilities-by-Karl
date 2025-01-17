@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const weeklyHoursInputDiv = document.getElementById('weeklyHoursInput');
   const timeMethodRadios = document.querySelectorAll('input[name="timeMethod"]');
 
-  let myChart; // To store the Chart.js instance so we can update or destroy
+  let myChart; // Chart.js instance
 
-  // Toggle time input fields
+  // Toggle time input methods
   timeMethodRadios.forEach(radio => {
     radio.addEventListener('change', () => {
       if (radio.value === 'total' && radio.checked) {
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
 
     const unit = document.getElementById('unitSelect').value;
-    const girthGain = parseFloat(document.getElementById('girthGain').value);
+    const girthGainRaw = parseFloat(document.getElementById('girthGain').value);
     const timeMethod = document.querySelector('input[name="timeMethod"]:checked').value;
     
     let totalHours;
@@ -43,33 +43,40 @@ document.addEventListener('DOMContentLoaded', () => {
       totalHours = hoursPerWeek * weeksDuration;
     }
 
-    // Validate
-    if (isNaN(girthGain) || girthGain <= 0 || isNaN(totalHours) || totalHours <= 0) {
+    // Basic validation
+    if (
+      isNaN(girthGainRaw) || girthGainRaw <= 0 ||
+      isNaN(totalHours) || totalHours <= 0
+    ) {
       resultDiv.textContent = 'Please enter valid, positive numbers.';
       visualizationDiv.textContent = '';
       clearChart();
       return;
     }
 
-    // Calculate hoursToGain (HtG₀.₁)
-    let hoursToGain;
+    // 1) Convert user-entered gain to inches if necessary
+    // 1 inch = 25.4 mm
+    let girthGainInches;
     if (unit === 'inches') {
-      hoursToGain = totalHours * (0.1 / girthGain);
+      girthGainInches = girthGainRaw;
     } else {
-      const targetMm = 2.54; // 0.1 inches in mm
-      hoursToGain = totalHours * (targetMm / girthGain);
+      // user selected mm
+      girthGainInches = girthGainRaw / 25.4; 
     }
 
-    resultDiv.textContent =
-      `Approximately ${hoursToGain.toFixed(2)} hours required per 0.1 ${unit === 'inches' ? 'inch' : 'mm'} of girth gain.`;
+    // 2) Calculate hoursToGain for 0.1 inch
+    // hoursToGain = totalHours * (0.1 / girthGainInches)
+    const hoursToGain = totalHours * (0.1 / girthGainInches);
 
-    // Compare to distribution (mean=26, sd=10)
+    resultDiv.textContent =
+      `Approximately ${hoursToGain.toFixed(2)} hours required per 0.1 inch of girth gain.`;
+
+    // 3) Compare to distribution (mean=26, sd=10), show faster/slower info
     const mean = 26;
     const sd = 10;
     const difference = (hoursToGain - mean) / mean * 100;
     const absDiff = Math.abs(difference).toFixed(1);
 
-    // Normal CDF percentile
     const z = (mean - hoursToGain) / sd;
     const fasterThan = normalCDF(z) * 100; 
     const slowerThan = 100 - fasterThan;
@@ -84,31 +91,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     visualizationDiv.textContent = message;
 
-    // Now draw the bell curve and the vertical line
+    // 4) Render the bell curve with the user’s vertical line
     createBellCurveChart(hoursToGain);
   });
 
   // Create or update the Chart.js chart
   function createBellCurveChart(hoursToGain) {
-    // If we already have a chart instance, destroy it before creating a new one
     clearChart();
 
-    // 1) Generate normal distribution data for x=0..60
     const mean = 26;
     const sd = 10;
     const xValues = [];
     const yValues = [];
-    const step = 0.5; // step size in hours
+    const step = 0.5;
     for (let x = 0; x <= 60; x += step) {
       xValues.push(x);
-      const pdfVal = normalPDF(x, mean, sd);
-      yValues.push(pdfVal);
+      yValues.push(normalPDF(x, mean, sd));
     }
 
-    // 2) Build a second dataset for the vertical line at hoursToGain
-    // We'll compute the PDF at that point so we can draw to the top of the curve
+    // vertical line from (hoursToGain,0) to (hoursToGain, pdf)
     const userY = normalPDF(hoursToGain, mean, sd);
-    // We'll just draw a vertical line from y=0 to y=userY
     const userLineData = [
       { x: hoursToGain, y: 0 },
       { x: hoursToGain, y: userY }
@@ -125,8 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
             data: yValues,
             borderColor: 'blue',
             fill: false,
-            tension: 0.1, // For a smooth curve
-            pointRadius: 0  // Hide the circles for each point
+            tension: 0.1,
+            pointRadius: 0
           },
           {
             label: 'Your HtG₀.₁',
@@ -163,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Destroy the existing chart instance if any
   function clearChart() {
     if (myChart) {
       myChart.destroy();
@@ -171,15 +172,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Normal PDF
+  // PDF for a normal distribution
   function normalPDF(x, mean, sd) {
-    const exponent = -0.5 * Math.pow((x - mean) / sd, 2);
+    const exponent = -0.5 * ((x - mean) / sd) ** 2;
     return (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
   }
 
-  // Approximation of the error function (erf)
+  // Error function for normalCDF
   function erf(x) {
-    let sign = (x >= 0) ? 1 : -1;
+    const sign = x >= 0 ? 1 : -1;
     x = Math.abs(x);
 
     const a1 = 0.254829592;
@@ -196,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return sign * y;
   }
 
-  // Standard Normal CDF using erf
+  // CDF for a standard normal
   function normalCDF(z) {
     return (1 - erf(-z / Math.sqrt(2))) / 2;
   }
