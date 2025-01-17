@@ -11,13 +11,18 @@ body {
   max-width: 500px;
   margin: 2rem auto;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.9); /* Semi-transparent background for readability */
+  background: rgba(255, 255, 255, 0.9); /* Slightly transparent white for readability */
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
   text-align: center;
+}
+
+p {
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 form {
